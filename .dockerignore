@@ -1,0 +1,7 @@
+.venv/
+.vscode/
+.env/
+.gitignore/
+*.pyc
+__pycache__/
+volumes/

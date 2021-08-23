@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "shoeguard"
+version = "0.1.0"
+description = ""
+authors = ["YeonGyu-Kim <code.yeon.gyu@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.2.6"
+djangorestframework = "^3.12.4"
+pytest-django = "^4.4.0"
+python-dotenv = "^0.19.0"
+gunicorn = "^20.1.0"
+psycopg2-binary = "^2.9.1"
+
+[tool.poetry.dev-dependencies]
+yapf = "^0.31.0"
+isort = "^5.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,18 @@
+{
+    "python.sortImports.path": "${workspaceFolder}/.venv/bin/isort",
+    "python.formatting.provider": "yapf",
+    "python.linting.pylintArgs": [
+        "--load-plugins=pylint_django"
+    ],
+    "[python]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.rulers": [
+            119,
+        ],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+}
