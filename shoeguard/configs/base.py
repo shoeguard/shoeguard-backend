@@ -111,6 +111,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Values that should be filled from other setting files
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':
+    ('rest_framework_simplejwt.authentication.JWTAuthentication', ),
+}
+
 SECRET_KEY = NotImplemented
 DATABASES = NotImplemented
 DEBUG = NotImplemented
