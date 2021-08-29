@@ -42,5 +42,18 @@ def test_success(client: Client):
     assert user.name == "홍길동"
 
 
-def test_fail_when_phone_number_duplicates():
-    pass
+@pytest.mark.django_db(transaction=True)
+def test_fail_when_phone_number_duplicates(client: Client):
+    User.objects.create_user(phone_number="01012341234",
+                             name="홍길동",
+                             password="e10nMuskP@ssword")
+    response = client.post(
+        '/api/v1/users/register',
+        data={
+            "phone_number": "01012341234",
+            "password": "e10nMuskP@ssword",
+            "name": "홍길동",
+        },
+    )
+    assert response.status_code == 400
+    assert User.objects.all().count() == 1
