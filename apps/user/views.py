@@ -17,3 +17,7 @@ class UserViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['GET'], detail=False)
+    def me(self, request: HttpRequest, *args, **kwargs):
+        pass
