@@ -1,6 +1,6 @@
 from django.http.request import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -8,12 +8,13 @@ from apps.user.models import User
 from apps.user.serializer import UserSerializer
 
 
-class UserViewSet(viewsets.GenericViewSet):
+class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
     def get_permissions(self):
-        if self.action == 'me':
+        AUTHENTICATION_REQUIRED_ACTIONS = ['me', 'update_password']
+        if self.action in AUTHENTICATION_REQUIRED_ACTIONS:
             return (permissions.IsAuthenticated(), )
         return (permissions.AllowAny(), )
 
@@ -29,3 +30,7 @@ class UserViewSet(viewsets.GenericViewSet):
     def me(self, request: HttpRequest, *args, **kwargs):
         serializer: UserSerializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+    @action(methods=['POST'], detail=False)
+    def update_password(self, request: HttpRequest, *args, **kwargs):
+        pass
