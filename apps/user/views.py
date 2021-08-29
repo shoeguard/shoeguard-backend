@@ -1,6 +1,6 @@
 from django.http.request import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import mixins, permissions, status, viewsets
+from rest_framework import mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -41,3 +41,9 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         serializer: PasswordUpdateSerializer = self.get_serializer(
             data=request.data, )
         serializer.is_valid(raise_exception=True)
+
+        old_password: str = request.data['old_password']
+        is_correct: bool = request.user.check_password(old_password)
+        if not is_correct:
+            raise serializers.ValidationError(
+                {"old_password": "old_password is not correct"})
