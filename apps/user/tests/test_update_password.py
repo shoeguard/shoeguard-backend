@@ -2,7 +2,7 @@ import pytest
 from apps.user.models import User
 from django.test.client import Client
 
-ENDPOINT = '/api/v1/users/update_password'
+ENDPOINT = '/api/v1/users/update-password'
 
 
 @pytest.mark.django_db(transaction=True)

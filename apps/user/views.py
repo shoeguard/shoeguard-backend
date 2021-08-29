@@ -38,7 +38,7 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         serializer: UserSerializer = UserSerializer(request.user)
         return Response(serializer.data)
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=['POST'], detail=False, url_path='update-password')
     def update_password(self, request: HttpRequest, *args, **kwargs):
         serializer: PasswordUpdateSerializer = self.get_serializer(
             data=request.data, )
