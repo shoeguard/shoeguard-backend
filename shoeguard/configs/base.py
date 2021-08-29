@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'drf_yasg',
+    'django_restful_admin',
     # my apps
     'apps.user',
 ]
