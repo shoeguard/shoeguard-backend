@@ -29,8 +29,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 3rd party
     'rest_framework',
     'drf_yasg',
+    # my apps
+    'apps.user',
 ]
 
 MIDDLEWARE = [
@@ -109,12 +112,14 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Values that should be filled from other setting files
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
     ('rest_framework_simplejwt.authentication.JWTAuthentication', ),
 }
+
+AUTH_USER_MODEL = 'user.User'
+
+# Values that should be filled from other setting files
 
 SECRET_KEY = NotImplemented
 DATABASES = NotImplemented
