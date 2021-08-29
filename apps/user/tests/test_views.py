@@ -11,8 +11,13 @@ def test_fail_when_no_phone_number(client: Client):
     assert response.status_code == 400
 
 
-def test_fail_when_no_phone_number(client: Client):
-    pass
+@pytest.mark.django_db(transaction=True)
+def test_fail_when_no_password(client: Client):
+    response = client.post(
+        '/api/v1/users/register',
+        data={"phone_number": "01012341234"},
+    )
+    assert response.status_code == 400
 
 
 def test_success(client):
