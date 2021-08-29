@@ -1,4 +1,5 @@
 import pytest
+from apps.user.models import User
 from django.test.client import Client
 
 
@@ -20,8 +21,25 @@ def test_fail_when_no_password(client: Client):
     assert response.status_code == 400
 
 
-def test_success(client):
-    pass
+@pytest.mark.django_db(transaction=True)
+def test_success(client: Client):
+    response = client.post(
+        '/api/v1/users/register',
+        data={
+            "phone_number": "01012341234",
+            "password": "e10nMuskP@ssword",
+            "name": "홍길동",
+        },
+    )
+    result = response.json()
+    assert response.status_code == 201
+    assert 'password' not in result
+    assert result["phone_number"] == "01012341234"
+    assert result["name"] == "홍길동"
+    assert User.objects.all().count() == 1
+    user: User = User.objects.all().first()
+    assert user.phone_number == "01012341234"
+    assert user.name == "홍길동"
 
 
 def test_fail_when_phone_number_duplicates():
