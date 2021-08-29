@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_restful_admin import admin as api_admin
 
 from apps.user.models import ParentChildPair, User
 
@@ -9,3 +10,6 @@ class UserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ParentChildPair)
+
+api_admin.site.register(User)
+api_admin.site.register(ParentChildPair)
