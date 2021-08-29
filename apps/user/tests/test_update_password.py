@@ -38,7 +38,32 @@ def test_fail_when_old_password_not_given(client: Client, user, get_token):
     assert 'old_password' in response.json()
 
 
-    assert False
+@pytest.mark.django_db(transaction=True)
+def test_fail_when_new_password_not_given(client: Client, user, get_token):
+    # given
+    token = get_token("01012341234", "e10nMuskP@ssword")
+
+    # when
+    response = client.post(
+        ENDPOINT,
+        data={
+            "old_password": "e10nMuskP@ssword",
+        },
+        HTTP_AUTHORIZATION=f"Bearer {token}",
+    )
+
+    # then
+    assert response.status_code == 400
+    assert 'new_password' in response.json()
+
+
+        },
+        HTTP_AUTHORIZATION=f"Bearer {token}",
+    )
+
+    # then
+    assert response.status_code == 400
+    assert 'new_password' in response.json()
 
 
 @pytest.fixture
