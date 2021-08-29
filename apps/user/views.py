@@ -27,4 +27,5 @@ class UserViewSet(viewsets.GenericViewSet):
     @swagger_auto_schema(responses={200: UserSerializer(many=False)})
     @action(methods=['GET'], detail=False)
     def me(self, request: HttpRequest, *args, **kwargs):
-        pass
+        serializer: UserSerializer = UserSerializer(request.user)
+        return Response(serializer.data)
