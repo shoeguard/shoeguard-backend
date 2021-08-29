@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django_restful_admin',
     # my apps
     'apps.user',
+    'apps.report',
 ]
 
 MIDDLEWARE = [
