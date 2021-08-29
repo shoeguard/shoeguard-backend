@@ -1,3 +1,5 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, serializers, status, viewsets
@@ -43,7 +45,18 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
 
         old_password: str = request.data['old_password']
+        new_password: str = request.data['new_password']
+
         is_correct: bool = request.user.check_password(old_password)
         if not is_correct:
             raise serializers.ValidationError(
                 {"old_password": "old_password is not correct"})
+
+        try:
+            validate_password(new_password)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message)
+
+        request.user.set_password(new_password)
+        request.user.save()
+        return Response()
