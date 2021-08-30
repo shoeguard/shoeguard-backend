@@ -4,9 +4,11 @@ from apps.user.models import ParentChildPair, User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_child = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'name')
+        fields = ('id', 'phone_number', 'name', 'is_child')
 
 
 class ParentChildSerializer(serializers.ModelSerializer):
@@ -20,10 +22,11 @@ class ParentChildSerializer(serializers.ModelSerializer):
 
 class UserPartnerSerializer(serializers.ModelSerializer):
     partner = ParentChildSerializer()
+    is_child = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'name', 'partner')
+        fields = ('id', 'phone_number', 'name', 'is_child', 'partner')
 
 
 class PasswordUpdateSerializer(serializers.Serializer):
