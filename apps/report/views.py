@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext_lazy as _
 from rest_framework import mixins, permissions, serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -15,7 +14,10 @@ class ReportViewSet(
         GenericViewSet,
 ):
     serializer_class = ReportSerializer
-    queryset = Report.objects.all()
+
+    def get_queryset(self):
+        partner_id: int = self.request.user.partner_id
+        return Report.objects.filter(parent_child_pair_id=partner_id)
 
     def get_permissions(self):
         return (permissions.IsAuthenticated(), )
