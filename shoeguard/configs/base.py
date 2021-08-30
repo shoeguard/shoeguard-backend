@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_restful_admin',
+    'model_utils',
+    'safedelete',
     # my apps
     'apps.user',
     'apps.report',
