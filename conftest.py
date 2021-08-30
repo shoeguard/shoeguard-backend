@@ -34,3 +34,21 @@ def get_token(client: Client):
         return response['access']
 
     return _get_token
+
+
+@pytest.fixture
+def create_user_and_get_token(create_user, get_token):
+    def _create_user_and_get_token(
+        phone_number: str = '01012341234',
+        password: str = '310nMuskP@ssw0rd',
+        name: str = '홍길동',
+    ) -> tuple[User, str]:
+        user: User = create_user(
+            phone_number=phone_number,
+            password=password,
+            name=name,
+        )
+        token: str = get_token(phone_number=phone_number, password=password)
+        return user, token
+
+    return _create_user_and_get_token

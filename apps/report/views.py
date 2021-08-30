@@ -1,4 +1,6 @@
-from rest_framework import mixins, permissions
+from django.http.request import HttpRequest
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import mixins, permissions, serializers
 from rest_framework.viewsets import GenericViewSet
 
 from apps.report.models import Report
@@ -18,3 +20,8 @@ class ReportViewSet(
         if self.action == 'create':
             return (permissions.IsAuthenticated(), )
         return super(ReportViewSet, self).get_permissions()
+
+    def create(self, request: HttpRequest, *args, **kwargs):
+        if request.user.partner is None:
+            raise serializers.ValidationError({"User": "User has no partner."})
+        return super(ReportViewSet, self).create(request, *args, **kwargs)
