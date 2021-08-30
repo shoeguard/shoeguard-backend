@@ -4,9 +4,14 @@ from django.test.client import Client
 ENDPOINT = '/api/v1/reports'
 
 
-@pytest.mark.django_db(transation=True)
+@pytest.mark.django_db(transaction=True)
 def test_fail_when_not_authenticated(client: Client):
-    pass
+    # when
+    response = client.get(ENDPOINT)
+
+    # then
+    assert response.status_code == 401
+
 
 
 @pytest.mark.django_db(transation=True)

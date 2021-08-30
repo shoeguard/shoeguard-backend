@@ -18,9 +18,7 @@ class ReportViewSet(
     queryset = Report.objects.all()
 
     def get_permissions(self):
-        if self.action == 'create':
-            return (permissions.IsAuthenticated(), )
-        return super(ReportViewSet, self).get_permissions()
+        return (permissions.IsAuthenticated(), )
 
     def create(self, request: Request, *args, **kwargs):
         if request.user.partner is None:
