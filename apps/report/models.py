@@ -14,7 +14,7 @@ class Report(BaseModel):
         ParentChildPair,
         on_delete=models.CASCADE,
     )
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
     audio_url = models.URLField(null=True)

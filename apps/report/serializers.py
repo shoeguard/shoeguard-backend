@@ -6,8 +6,6 @@ from apps.user.serializers import ParentChildSerializer
 
 class ReportSerializer(serializers.ModelSerializer):
     parent_child_pair = ParentChildSerializer
-    latitude = serializers.FloatField(read_only=True)
-    longitude = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Report
