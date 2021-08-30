@@ -7,7 +7,11 @@ DATA = {"address": "서울시 용산구 원효로97길 33-4", "reported_device":
 
 @pytest.mark.django_db(transaction=True)
 def test_fail_when_not_authenticated(client: Client):
-    pass
+    # when
+    response = client.post(ENDPOINT, data=DATA)
+
+    # then
+    assert response.status_code == 401
 
 
 @pytest.mark.django_db(transaction=True)
