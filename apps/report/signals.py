@@ -14,9 +14,14 @@ def report_pre_save_handler(
     *args,
     **kwargs,
 ):
-    geolocator = Nominatim(user_agent="shoeguard")
-    location = geolocator.geocode(instance.address)
 
-    if location is not None:
-        instance.latitude = location.latitude
-        instance.longitude = location.longitude
+    geolocator = Nominatim(user_agent="shoeguard")
+    if instance.latitude is not None and instance.longitude is not None:
+        location = geolocator.reverse(instance.latitude, instance.longitude)
+        instance.address = location.address
+
+    if instance.address is not None:
+        location = geolocator.geocode(instance.address)
+        if location is not None:
+            instance.latitude = location.latitude
+            instance.longitude = location.longitude
