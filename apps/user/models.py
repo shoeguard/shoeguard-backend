@@ -4,6 +4,8 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db import models
 
+from apps.common.models import BaseModel
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -44,7 +46,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class ParentChildPair(models.Model):
+class ParentChildPair(BaseModel):
     child = models.ForeignKey(
         'User',
         on_delete=models.CASCADE,
@@ -79,6 +81,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+
+    date_joined = models.DateTimeField(auto_now_add=True)
 
     @property
     def is_child(self) -> Union[bool, None]:
