@@ -11,4 +11,6 @@ class ReportViewSet(
         mixins.ListModelMixin,
         GenericViewSet,
 ):
-    pass
+    serializer_class = ReportSerializer
+    queryset = Report.objects.all()
+
