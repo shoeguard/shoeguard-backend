@@ -1,3 +1,4 @@
+from apps.report.views import ReportViewSet
 from apps.user.views import UserViewSet
 from django.urls import path
 from rest_framework import serializers
@@ -8,6 +9,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 
 router = DefaultRouter(trailing_slash=False)
 router.register(r'users', UserViewSet, basename='users')
+router.register(r'reports', ReportViewSet, basename='reports')
 
 
 class DocumentedTokenObtainPairView(TokenObtainPairView):

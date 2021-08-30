@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework import mixins, permissions
+from rest_framework.viewsets import GenericViewSet
 
-# Create your views here.
+from apps.report.models import Report
+from apps.report.serializers import ReportSerializer
+
+
+class ReportViewSet(
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.ListModelMixin,
+        GenericViewSet,
+):
+    pass
