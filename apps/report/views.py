@@ -25,4 +25,9 @@ class ReportViewSet(
     def create(self, request: Request, *args, **kwargs):
         if request.user.partner is None:
             raise serializers.ValidationError({"User": "User has no partner."})
-        return super(ReportViewSet, self).create(request, *args, **kwargs)
+
+        payload = dict(request.data)
+        payload['parent_child_pair'] = request.user.partner_id
+
+        serializer: ReportSerializer = self.get_serializer(data=payload)
+        serializer.is_valid(raise_exception=True)
