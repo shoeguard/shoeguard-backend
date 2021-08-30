@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.user.models import User
-from apps.user.serializer import PasswordUpdateSerializer, UserSerializer
+from apps.user.serializers import PasswordUpdateSerializer, UserSerializer
 
 
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
