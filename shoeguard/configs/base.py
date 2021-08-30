@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     # my apps
     'apps.user',
     'apps.report',
+    'apps.location_history',
 ]
 
 MIDDLEWARE = [
