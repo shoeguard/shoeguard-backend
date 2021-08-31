@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -39,9 +40,19 @@ class LocationHistoryViewSet(
             headers=headers,
         )
 
+    @swagger_auto_schema(
+        responses={
+            200: LocationHistorySerializer(many=False),
+            404: "Not Found",
+        },
+        operation_summary="Get recent location history",
+    )
     @action(methods=['GET'], detail=False, url_path='recent')
     def get_recent(self, request: Request):
         location_history: LocationHistory = self.get_queryset().first()
+
+        if location_history is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer: LocationHistorySerializer = self.get_serializer(
             location_history, )

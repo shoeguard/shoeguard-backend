@@ -62,6 +62,7 @@ def test_success(client: Client, child_and_parent, child_and_parent_2):
             latitude=333,
             longitude=222,
         )
+
     # when
     response = client.get(ENDPOINT, HTTP_AUTHORIZATION=f"Bearer {child_token}")
 
@@ -70,6 +71,18 @@ def test_success(client: Client, child_and_parent, child_and_parent_2):
     result = response.json()
     assert result["latitude"] == 313
     assert result["longitude"] == 909
+
+
+@pytest.mark.django_db(transaction=True)
+def test_fail_when_no_location_history(client: Client, child_and_parent):
+    # given
+    child_token: str = child_and_parent["child_token"]
+
+    # when
+    response = client.get(ENDPOINT, HTTP_AUTHORIZATION=f"Bearer {child_token}")
+
+    # then
+    assert response.status_code == 404
 
 
 @pytest.fixture
