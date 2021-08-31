@@ -42,7 +42,7 @@ def test_fail_when_requested_user_has_no_parent_child_pair(
     # then
     result = response.json()
     assert response.status_code == 400
-    assert 'User' in result
+    assert "non_field_errors" in result
     assert LocationHistory.objects.all().count() == 0
 
 
