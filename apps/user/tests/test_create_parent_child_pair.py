@@ -43,6 +43,36 @@ def test_fail_when_parent_child_pair_is_already_created(
 
 
 @pytest.mark.django_db(transaction=True)
+def test_fail_when_try_to_create_not_related_parent_child_pair(
+    client: Client,
+    child_and_parent,
+    create_user_and_get_token,
+):
+    # given
+    _, token = create_user_and_get_token()
+    user2, _ = create_user_and_get_token(phone_number='01033331234')
+    user3, _ = create_user_and_get_token(phone_number='01033331334')
+    data = {
+        'child_id': user2.pk,
+        'parent_id': user3.pk,
+    }
+    # when
+    response = client.post(
+        ENDPOINT,
+        json.dumps(data),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {token}",
+    )
+
+    # then
+    assert response.status_code == 400
+    assert response.json() == {
+        "non_field_errors":
+        ["One of child_id or parent_id should include requested user's pk."]
+    }
+
+
+@pytest.mark.django_db(transaction=True)
 def test_fail_when_parent_child_pair_is_already_registered_to_child():
     pass
 
