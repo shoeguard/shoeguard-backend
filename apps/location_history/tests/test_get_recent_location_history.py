@@ -82,7 +82,7 @@ def test_fail_when_no_location_history(client: Client, child_and_parent):
     response = client.get(ENDPOINT, HTTP_AUTHORIZATION=f"Bearer {child_token}")
 
     # then
-    assert response.status_code == 404
+    assert response.status_code == 204
 
 
 @pytest.fixture

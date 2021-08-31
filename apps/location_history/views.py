@@ -46,7 +46,7 @@ class LocationHistoryViewSet(
     @swagger_auto_schema(
         responses={
             200: LocationHistorySerializer(many=False),
-            404: "Not Found",
+            204: "No Content",
         },
         operation_summary="Get recent location history",
     )
@@ -55,7 +55,7 @@ class LocationHistoryViewSet(
         location_history: LocationHistory = self.get_queryset().first()
 
         if location_history is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer: LocationHistorySerializer = self.get_serializer(
             location_history, )
