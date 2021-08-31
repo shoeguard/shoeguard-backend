@@ -6,8 +6,9 @@ from rest_framework import mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.user.models import User
-from apps.user.serializers import (PasswordUpdateSerializer,
+from apps.user.models import ParentChildPair, User
+from apps.user.serializers import (ParentChildPairSerializer,
+                                   PasswordUpdateSerializer,
                                    UserPartnerSerializer, UserSerializer)
 
 
@@ -69,3 +70,7 @@ class UserViewSet(viewsets.GenericViewSet):
         request.user.set_password(new_password)
         request.user.save()
         return Response()
+
+
+class ParentChildPairViewSet(viewsets.GenericViewSet):
+    pass
