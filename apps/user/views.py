@@ -76,3 +76,9 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = ParentChildPairSerializer
     permission_classes = (permissions.IsAuthenticated, )
     queryset = ParentChildPair.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        if request.user.partner is not None:
+            raise serializers.ValidationError(
+                {"non_field_errors": ["ParentChildPair already exists."]})
+        super(ParentChildPairViewSet, self).create(request, *args, **kwargs)

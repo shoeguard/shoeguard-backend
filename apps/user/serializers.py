@@ -12,12 +12,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ParentChildPairSerializer(serializers.ModelSerializer):
-    child = UserSerializer()
-    parent = UserSerializer()
+    child = UserSerializer(read_only=True)
+    parent = UserSerializer(read_only=True)
+    child_id = serializers.IntegerField(write_only=True)
+    parent_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = ParentChildPair
-        fields = ('id', 'child', 'parent')
+        fields = ('id', 'child', 'parent', 'child_id', 'parent_id')
 
 
 class UserPartnerSerializer(serializers.ModelSerializer):
