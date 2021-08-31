@@ -72,5 +72,7 @@ class UserViewSet(viewsets.GenericViewSet):
         return Response()
 
 
-class ParentChildPairViewSet(viewsets.GenericViewSet):
-    pass
+class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = ParentChildPairSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+    queryset = ParentChildPair.objects.none()
