@@ -1,4 +1,5 @@
 from rest_framework import mixins, permissions, serializers, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -11,7 +12,6 @@ class LocationHistoryViewSet(
         viewsets.GenericViewSet,
 ):
     serializer_class = LocationHistorySerializer
-    queryset = LocationHistory.objects.all()
     permission_classes = (permissions.IsAuthenticated, )
 
     def create(self, request: Request, *args, **kwargs):
@@ -33,3 +33,7 @@ class LocationHistoryViewSet(
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+    @action(methods=['GET'], detail=False, path='recent')
+    def get_recent(self, request: Request):
+        pass
