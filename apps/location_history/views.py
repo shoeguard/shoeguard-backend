@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from apps.location_history.models import LocationHistory
 from apps.location_history.serializers import LocationHistorySerializer
+from apps.user.models import User
 
 
 class LocationHistoryViewSet(
@@ -24,20 +25,19 @@ class LocationHistoryViewSet(
             parent_child_pair_id=partner_id).order_by('-created')
 
     def create(self, request: Request, *args, **kwargs):
-        if request.user.partner is None:
+        user: User = request.user
+        if user.partner is None:
             raise serializers.ValidationError(
                 {"non_field_errors": "Requested user has no partner."})
 
         payload = dict(request.data)
-        payload['parent_child_pair'] = request.user.partner_id
-
+        payload['parent_child_pair'] = user.partner_id
         serializer: LocationHistorySerializer = self.get_serializer(
             data=payload)
         serializer.is_valid(raise_exception=True)
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
         return Response(
             serializer.data,
             status=status.HTTP_201_CREATED,
@@ -54,7 +54,6 @@ class LocationHistoryViewSet(
     @action(methods=['GET'], detail=False, url_path='recent')
     def get_recent(self, request: Request):
         location_history: LocationHistory = self.get_queryset().first()
-
         if location_history is None:
             return Response(status=status.HTTP_204_NO_CONTENT)
 

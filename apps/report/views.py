@@ -5,6 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.report.models import Report
 from apps.report.serializers import ReportSerializer
+from apps.user.models import User
 
 
 class ReportViewSet(
@@ -27,19 +28,18 @@ class ReportViewSet(
         return (permissions.IsAuthenticated(), )
 
     def create(self, request: Request, *args, **kwargs):
-        if request.user.partner is None:
+        user: User = request.user
+        if user.partner is None:
             raise serializers.ValidationError(
                 {"non_field_errors": "Requested user has no partner."})
 
         payload = dict(request.data)
-        payload['parent_child_pair'] = request.user.partner_id
-
+        payload['parent_child_pair'] = user.partner_id
         serializer: ReportSerializer = self.get_serializer(data=payload)
         serializer.is_valid(raise_exception=True)
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
         return Response(
             serializer.data,
             status=status.HTTP_201_CREATED,
