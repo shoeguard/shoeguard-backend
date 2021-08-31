@@ -2,17 +2,20 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import mixins, permissions, serializers, status, viewsets
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.user.models import User
-from apps.user.serializers import PasswordUpdateSerializer, UserSerializer
+from apps.user.serializers import (PasswordUpdateSerializer,
+                                   UserPartnerSerializer, UserSerializer)
 
 
-class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
+class UserViewSet(viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        if self.action == 'me':
+            return UserPartnerSerializer
+        return UserSerializer
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'update_password':
@@ -32,10 +35,10 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(responses={200: UserSerializer(many=False)})
+    @swagger_auto_schema(responses={200: UserPartnerSerializer(many=False)})
     @action(methods=['GET'], detail=False)
     def me(self, request: HttpRequest, *args, **kwargs):
-        serializer: UserSerializer = UserSerializer(request.user)
+        serializer: UserPartnerSerializer = UserPartnerSerializer(request.user)
         return Response(serializer.data)
 
     @action(methods=['POST'], detail=False, url_path='update-password')
