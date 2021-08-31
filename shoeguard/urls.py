@@ -15,42 +15,17 @@ Including another URLconf
 """
 from apps.api.urls import urlpatterns as api_urlpatterns
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django_restful_admin import admin as api_admin
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="ShoeGuard API",
-        default_version="v1",
-        description="ShoeGuard API",
-        contact=openapi.Contact(
-            name="YeonGyu Kim",
-            email="public.kim.yeon.gyu@gmail.com",
-        ),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny, ),
-)
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
 
 urlpatterns = [
-    re_path(
-        r'^swagger(?P<format>\.json|\.yaml)$',
-        schema_view.without_ui(cache_timeout=0),
-        name='schema-json',
-    ),
-    re_path(
-        r'^swagger/$',
-        schema_view.with_ui('swagger', cache_timeout=0),
-        name='schema-swagger-ui',
-    ),
-    re_path(
-        r'^redoc/$',
-        schema_view.with_ui('redoc', cache_timeout=0),
-        name='schema-redoc',
-    ),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('schema/swagger-ui/',
+         SpectacularSwaggerView.as_view(),
+         name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(), name='redoc'),
     path('admin/', admin.site.urls),
     path('api/v1/admin/', api_admin.site.urls),
     path('api/v1/', include(api_urlpatterns)),

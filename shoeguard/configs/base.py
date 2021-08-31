@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django_restful_admin',
     'model_utils',
     'safedelete',
+    'drf_spectacular',
     # my apps
     'apps.user',
     'apps.report',
@@ -118,8 +119,16 @@ STATIC_ROOT = BASE_DIR / 'static'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS':
+    'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES':
-    ('rest_framework_simplejwt.authentication.JWTAuthentication', ),
+    ('rest_framework_simplejwt.authentication.JWTAuthentication', )
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "ShoeGuard API",
+    "DESCRIPTION": "ShoeGuard API",
+    "VERSION": "1.0.0",
 }
 
 AUTH_USER_MODEL = 'user.User'
