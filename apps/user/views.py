@@ -75,7 +75,14 @@ class UserViewSet(viewsets.GenericViewSet):
 class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = ParentChildPairSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    queryset = ParentChildPair.objects.none()
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return ParentChildPair.objects.none()
+
+        partner_id: int = self.request.user.partner_id
+        return ParentChildPair.objects.filter(
+            parent_child_pair_id=partner_id).order_by('-created')
 
     def create(self, request, *args, **kwargs):
         user: User = request.user
@@ -89,6 +96,11 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         child_id, parent_id = request.data.get('child_id'), request.data.get(
             'parent_id')
 
+        if child_id == parent_id:
+            raise serializers.ValidationError({
+                "non_field_errors": ["Parent and Child must not be the same."]
+            })
+
         if user.pk not in (child_id, parent_id):
             raise serializers.ValidationError({
                 "non_field_errors": [
@@ -98,6 +110,8 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data,
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )

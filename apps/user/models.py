@@ -59,8 +59,11 @@ class ParentChildPair(BaseModel):
     )
 
     def save(self, *args, **kwargs):
+        if self.child.partner is not None or self.parent.partner is not None:
+            raise ValueError('ParentChildPair already exists.')
         if self.parent == self.child:
-            raise ValueError('Parent and Child must not be the same')
+            raise ValueError('Parent and Child must not be the same.')
+
         super(ParentChildPair, self).save(*args, **kwargs)
 
 

@@ -72,6 +72,32 @@ def test_fail_when_try_to_create_not_related_parent_child_pair(
 
 
 @pytest.mark.django_db(transaction=True)
+def test_fail_when_child_parent_to_self(
+    client: Client,
+    create_user_and_get_token,
+):
+    # given
+    user, token = create_user_and_get_token()
+    data = {
+        'child_id': user.pk,
+        'parent_id': user.pk,
+    }
+    # when
+    response = client.post(
+        ENDPOINT,
+        json.dumps(data),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {token}",
+    )
+
+    # then
+    assert response.status_code == 400
+    assert response.json() == {
+        "non_field_errors": ["Parent and Child must not be the same."]
+    }
+
+
+@pytest.mark.django_db(transaction=True)
 def test_fail_when_parent_child_pair_is_already_registered_to_child(
     client: Client,
     child_and_parent,
