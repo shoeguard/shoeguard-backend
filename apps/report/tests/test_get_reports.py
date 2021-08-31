@@ -44,7 +44,7 @@ def test_get_only_related_reports(
 
     location = DuckTypingLocation(37.54250185, 126.96721882587426)
 
-    with patch("apps.report.signals.Nominatim.geocode", return_value=location):
+    with patch("apps.common.utils.Nominatim.geocode", return_value=location):
         for _ in range(CAP_1_REPORT_COUNT):
             Report.objects.create(
                 parent_child_pair=CAP_1_PARENT_CHILD_PAIR,
