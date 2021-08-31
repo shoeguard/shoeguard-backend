@@ -34,6 +34,6 @@ class LocationHistoryViewSet(
             headers=headers,
         )
 
-    @action(methods=['GET'], detail=False, path='recent')
+    @action(methods=['GET'], detail=False, url_path='recent')
     def get_recent(self, request: Request):
         pass
