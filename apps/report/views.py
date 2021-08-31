@@ -20,7 +20,8 @@ class ReportViewSet(
             return Report.objects.none()
 
         partner_id: int = self.request.user.partner_id
-        return Report.objects.filter(parent_child_pair_id=partner_id)
+        return Report.objects.filter(parent_child_pair_id=partner_id
+                                     ).select_related('parent_child_pair')
 
     def get_permissions(self):
         return (permissions.IsAuthenticated(), )
