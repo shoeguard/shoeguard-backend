@@ -16,7 +16,7 @@ class ReportViewSet(
     serializer_class = ReportSerializer
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return Report.objects.none()
 
         partner_id: int = self.request.user.partner_id

@@ -16,7 +16,7 @@ class LocationHistoryViewSet(
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return LocationHistory.objects.none()
 
         partner_id: int = self.request.user.partner_id
