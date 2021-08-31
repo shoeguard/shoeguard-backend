@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
@@ -85,22 +87,15 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             parent_child_pair_id=partner_id).order_by('-created')
 
     def create(self, request, *args, **kwargs):
+        # validation
         user: User = request.user
+        data: Dict[str, any] = request.data
         if user.partner is not None:
             raise serializers.ValidationError(
                 {"non_field_errors": ["ParentChildPair already exists."]})
 
-        serializer: ParentChildPairSerializer = self.get_serializer(
-            data=request.data)
-        serializer.is_valid(raise_exception=True)
-        child_id, parent_id = request.data.get('child_id'), request.data.get(
-            'parent_id')
-
-        if child_id == parent_id:
-            raise serializers.ValidationError({
-                "non_field_errors": ["Parent and Child must not be the same."]
-            })
-
+        child_id = data.get('child_id')
+        parent_id = data.get('parent_id')
         if user.pk not in (child_id, parent_id):
             raise serializers.ValidationError({
                 "non_field_errors": [
@@ -108,10 +103,11 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
                 ]
             })
 
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
+        return super(ParentChildPairViewSet,
+                     self).create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save()
+        except ValueError as e:
+            raise serializers.ValidationError({"non_field_errors": [str(e)]})
