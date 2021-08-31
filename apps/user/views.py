@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import permissions, serializers, status, viewsets
+from rest_framework import mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -16,6 +16,12 @@ class UserViewSet(viewsets.GenericViewSet):
         if self.action == 'me':
             return UserPartnerSerializer
         return UserSerializer
+
+    def get_queryset(self):
+        if self.action == 'me':
+            return User.objects.all().select_related('partner').select_related(
+                'child', 'parent')
+        return User.objects.all()
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'update_password':
