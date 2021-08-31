@@ -78,7 +78,8 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = ParentChildPair.objects.none()
 
     def create(self, request, *args, **kwargs):
-        if request.user.partner is not None:
+        user: User = request.user
+        if user.partner is not None:
             raise serializers.ValidationError(
                 {"non_field_errors": ["ParentChildPair already exists."]})
 
@@ -88,7 +89,7 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         child_id, parent_id = serializer.data.get(
             'child_id'), serializer.data.get('parent_id')
 
-        if request.user.pk not in (child_id, parent_id):
+        if user.pk not in (child_id, parent_id):
             raise serializers.ValidationError({
                 "non_field_errors": [
                     "One of child_id or parent_id should include requested user's pk."

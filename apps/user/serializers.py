@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import serializers
 
 from apps.user.models import ParentChildPair, User
@@ -12,10 +13,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ParentChildPairSerializer(serializers.ModelSerializer):
+    def unique_parent_and_child(user_pk: int):
+        if ParentChildPair.objects.filter(
+                Q(parent_id=user_pk) | Q(child_id=user_pk)).exists():
+            raise serializers.ValidationError(
+                'Already associated with another ParentChildPair.')
+
     child = UserSerializer(read_only=True)
     parent = UserSerializer(read_only=True)
-    child_id = serializers.IntegerField(write_only=True)
-    parent_id = serializers.IntegerField(write_only=True)
+    child_id = serializers.IntegerField(
+        write_only=True,
+        validators=(unique_parent_and_child, ),
+    )
+    parent_id = serializers.IntegerField(
+        write_only=True,
+        validators=(unique_parent_and_child, ),
+    )
 
     class Meta:
         model = ParentChildPair
