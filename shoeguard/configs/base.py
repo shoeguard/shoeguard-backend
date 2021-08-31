@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 3rd party
     'rest_framework',
-    'drf_yasg',
     'django_restful_admin',
     'model_utils',
     'safedelete',
