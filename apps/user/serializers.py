@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'phone_number', 'name', 'is_child')
 
 
-class ParentChildSerializer(serializers.ModelSerializer):
+class ParentChildPairSerializer(serializers.ModelSerializer):
     child = UserSerializer()
     parent = UserSerializer()
 
@@ -21,7 +21,7 @@ class ParentChildSerializer(serializers.ModelSerializer):
 
 
 class UserPartnerSerializer(serializers.ModelSerializer):
-    partner = ParentChildSerializer()
+    partner = ParentChildPairSerializer()
     is_child = serializers.BooleanField(read_only=True)
 
     class Meta:

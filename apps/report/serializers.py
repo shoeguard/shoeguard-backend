@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
 from apps.report.models import Report
-from apps.user.serializers import ParentChildSerializer
+from apps.user.serializers import ParentChildPairSerializer
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    parent_child_pair = ParentChildSerializer
+    parent_child_pair = ParentChildPairSerializer
 
     class Meta:
         model = Report
