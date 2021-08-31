@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework import mixins, viewsets
 
-# Create your views here.
+
+class LocationHistoryViewSet(
+        mixins.CreateModelMixin,
+        viewsets.GenericViewSet,
+):
+    pass

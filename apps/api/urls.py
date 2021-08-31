@@ -1,3 +1,4 @@
+from apps.location_history.views import LocationHistoryViewSet
 from apps.report.views import ReportViewSet
 from apps.user.views import UserViewSet
 from django.urls import path
@@ -10,6 +11,11 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 router = DefaultRouter(trailing_slash=False)
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'reports', ReportViewSet, basename='reports')
+router.register(
+    r'location-history',
+    LocationHistoryViewSet,
+    basename='location_histories',
+)
 
 
 class DocumentedTokenObtainPairView(TokenObtainPairView):
