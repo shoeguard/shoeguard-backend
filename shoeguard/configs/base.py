@@ -124,6 +124,9 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'user.User'
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Values that should be filled from other setting files
 
 SECRET_KEY = NotImplemented
