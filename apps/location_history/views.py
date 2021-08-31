@@ -14,6 +14,11 @@ class LocationHistoryViewSet(
     serializer_class = LocationHistorySerializer
     permission_classes = (permissions.IsAuthenticated, )
 
+    def get_queryset(self):
+        partner_id: int = self.request.user.partner_id
+        return LocationHistory.objects.filter(
+            parent_child_pair_id=partner_id).order_by('-created')
+
     def create(self, request: Request, *args, **kwargs):
         if request.user.partner is None:
             raise serializers.ValidationError({"User": "User has no partner."})
@@ -36,4 +41,8 @@ class LocationHistoryViewSet(
 
     @action(methods=['GET'], detail=False, url_path='recent')
     def get_recent(self, request: Request):
-        pass
+        location_history: LocationHistory = self.get_queryset().first()
+
+        serializer: LocationHistorySerializer = self.get_serializer(
+            location_history, )
+        return Response(serializer.data)
