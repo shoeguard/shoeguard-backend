@@ -99,8 +99,36 @@ def test_fail_when_parent_child_pair_is_already_registered_to_child(
 
 
 @pytest.mark.django_db(transaction=True)
-def test_success():
-    pass
+def test_success(
+    client: Client,
+    create_user_and_get_token,
+):
+    # given
+    user1, token = create_user_and_get_token(phone_number='01033331234')
+    user2, _ = create_user_and_get_token(phone_number='01033331334')
+    data = {
+        'child_id': user1.pk,
+        'parent_id': user2.pk,
+    }
+    # when
+    response = client.post(
+        ENDPOINT,
+        json.dumps(data),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {token}",
+    )
+
+    # then
+    result = response.json()
+    print(result)
+    assert response.status_code == 201
+    assert result["child"]["id"] == user1.pk
+    assert result["parent"]["id"] == user2.pk
+
+    assert ParentChildPair.objects.count() == 1
+    parent_child_pair = ParentChildPair.objects.first()
+    assert parent_child_pair.child == user1
+    assert parent_child_pair.parent == user2
 
 
 @pytest.fixture

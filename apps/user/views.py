@@ -86,8 +86,8 @@ class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer: ParentChildPairSerializer = self.get_serializer(
             data=request.data)
         serializer.is_valid(raise_exception=True)
-        child_id, parent_id = serializer.data.get(
-            'child_id'), serializer.data.get('parent_id')
+        child_id, parent_id = request.data.get('child_id'), request.data.get(
+            'parent_id')
 
         if user.pk not in (child_id, parent_id):
             raise serializers.ValidationError({
