@@ -1,14 +1,13 @@
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
+from typing import Union
 
 from apps.common.utils import geocode, reverse_geocode
+from apps.location_history.models import LocationHistory
 from apps.report.models import Report
 
 
-@receiver(pre_save, sender=Report)
-def report_pre_save_handler(
+def geocode_pre_save_handler(
     sender,
-    instance: Report,
+    instance: Union[Report, LocationHistory],
     raw,
     update_fields,
     *args,

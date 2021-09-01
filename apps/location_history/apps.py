@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.db.models.signals import pre_save
 
 
 class LocationHistoryConfig(AppConfig):
@@ -6,4 +7,6 @@ class LocationHistoryConfig(AppConfig):
     name = 'apps.location_history'
 
     def ready(self):
-        import apps.location_history.signals
+        from apps.common.signals import geocode_pre_save_handler
+        from apps.location_history.models import LocationHistory
+        pre_save.connect(geocode_pre_save_handler, LocationHistory)
