@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from apps.common.decorators import check_partner_available_class_view
 from apps.report.models import Report
 from apps.report.serializers import ReportSerializer
 from apps.user.models import User
@@ -27,11 +28,9 @@ class ReportViewSet(
     def get_permissions(self):
         return (permissions.IsAuthenticated(), )
 
+    @check_partner_available_class_view
     def create(self, request: Request, *args, **kwargs):
         user: User = request.user
-        if user.partner is None:
-            raise serializers.ValidationError(
-                {"non_field_errors": "Requested user has no partner."})
 
         payload = dict(request.data)
         payload['parent_child_pair'] = user.partner_id

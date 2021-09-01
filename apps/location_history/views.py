@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.common.decorators import check_partner_available_class_view
 from apps.location_history.models import LocationHistory
 from apps.location_history.serializers import LocationHistorySerializer
 from apps.user.models import User
@@ -24,11 +25,9 @@ class LocationHistoryViewSet(
         return LocationHistory.objects.filter(
             parent_child_pair_id=partner_id).order_by('-created')
 
+    @check_partner_available_class_view
     def create(self, request: Request, *args, **kwargs):
         user: User = request.user
-        if user.partner is None:
-            raise serializers.ValidationError(
-                {"non_field_errors": "Requested user has no partner."})
 
         payload = dict(request.data)
         payload['parent_child_pair'] = user.partner_id
