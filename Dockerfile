@@ -12,6 +12,8 @@ COPY poetry.lock poetry.lock
 COPY pyproject.toml pyproject.toml
 RUN poetry install --no-dev
 
+EXPOSE 8000
+
 COPY . /app
 
 CMD bash -c "\
