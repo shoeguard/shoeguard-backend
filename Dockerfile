@@ -19,4 +19,4 @@ COPY . /app
 CMD bash -c "\
     poetry run python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE;\
     poetry run python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE; \
-    poetry run gunicorn shoeguard.wsgi:application"
+    poetry run gunicorn shoeguard.wsgi:application --bind 0.0.0.0:8000"
