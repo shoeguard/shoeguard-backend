@@ -15,6 +15,6 @@ RUN poetry install --no-dev
 COPY . /app
 
 CMD bash -c "\
-    poetry run python manage.py collectstatic --noinput; \
-    poetry run python manage.py migrate; \
-    poetry run gunicorn shoeguard.wsgi:application"
+    poetry run python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE;\
+    poetry run python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE; \
+    poetry run gunicorn shoeguard.wsgi:application --settings=$DJANGO_SETTINGS_MODULE"
