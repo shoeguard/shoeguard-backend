@@ -71,6 +71,10 @@ class UserViewSet(viewsets.GenericViewSet):
         request.user.save()
         return Response()
 
+    @action(methods=['POST'], detail=False, url_path='add-child')
+    def add_child(self, request: HttpRequest, *args, **kwargs):
+        pass
+
 
 class ParentChildPairViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = ParentChildPairSerializer

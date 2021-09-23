@@ -4,6 +4,10 @@ from rest_framework import serializers
 from apps.user.models import ParentChildPair, User
 
 
+class AddChildSerializer(serializers.Serializer):
+    child_id = serializers.IntegerField(required=True)
+
+
 class UserSerializer(serializers.ModelSerializer):
     is_child = serializers.BooleanField(read_only=True)
 
