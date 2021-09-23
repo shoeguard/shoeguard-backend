@@ -1,6 +1,6 @@
 from apps.location_history.views import LocationHistoryViewSet
 from apps.report.views import ReportViewSet
-from apps.user.views import UserViewSet
+from apps.user.views import PhoneVerificationViewSet, UserViewSet
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (TokenObtainPairView,
@@ -8,6 +8,11 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 
 router = DefaultRouter(trailing_slash=False)
 router.register(r'users', UserViewSet, basename='users')
+router.register(
+    r'phone-verification',
+    PhoneVerificationViewSet,
+    basename='phone_verification',
+)
 router.register(r'reports', ReportViewSet, basename='reports')
 router.register(
     r'location-history',

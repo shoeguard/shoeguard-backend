@@ -106,3 +106,10 @@ class UserViewSet(viewsets.GenericViewSet):
             instance=self.request.user)
 
         return Response(response_serializer.data)
+
+
+class PhoneVerificationViewSet(mixins.CreateModelMixin,
+                               viewsets.GenericViewSet):
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = AuthSerializer
+    queryset = Auth.objects.none()
