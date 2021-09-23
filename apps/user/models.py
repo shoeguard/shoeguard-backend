@@ -96,7 +96,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Auth(BaseModel):
     phone_number = models.CharField(max_length=12)
-    code = models.IntegerField(max_length=6)
+    code = models.IntegerField()
     is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
