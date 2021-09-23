@@ -6,7 +6,8 @@ from rest_framework.response import Response
 
 from apps.common.decorators import check_partner_available_class_view
 from apps.location_history.models import LocationHistory
-from apps.location_history.serializers import LocationHistorySerializer
+from apps.location_history.serializers import (LocationHistorySerializer,
+                                               NewLocationHistorySerializer)
 from apps.user.models import User
 
 
@@ -14,7 +15,11 @@ class LocationHistoryViewSet(
         mixins.CreateModelMixin,
         viewsets.GenericViewSet,
 ):
-    serializer_class = LocationHistorySerializer
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return NewLocationHistorySerializer
+        return LocationHistorySerializer
+
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_queryset(self):
@@ -25,17 +30,17 @@ class LocationHistoryViewSet(
         return LocationHistory.objects.filter(
             parent_child_pair_id=partner_id).order_by('-created')
 
-    @check_partner_available_class_view
     def create(self, request: Request, *args, **kwargs):
         user: User = request.user
+        if user.parent is None:
+            raise serializers.ValidationError(
+                {"non_field_errors": "Reporter must have parent"})
 
-        payload = dict(request.data)
-        payload['parent_child_pair'] = user.partner_id
-        serializer: LocationHistorySerializer = self.get_serializer(
-            data=payload)
+        serializer: NewLocationHistorySerializer = self.get_serializer(
+            data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save(reporter=user)
 
-        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data,
