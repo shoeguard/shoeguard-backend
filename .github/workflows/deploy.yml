@@ -80,6 +80,8 @@ jobs:
           port: 22
           script: |
             cd shoeguard-backend;\
+            git checkout master;\
+            git pull;\
             export DJANGO_SETTINGS_MODULE=shoeguard.configs.prod;\
             docker-compose down;
             docker container prune -f;\
