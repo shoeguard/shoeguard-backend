@@ -1,8 +1,9 @@
 import json
+from typing import Dict, Union
 
 import pytest
 from apps.location_history.models import LocationHistory
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 from django.test.client import Client
 
 ENDPOINT = '/api/v1/location-history'
@@ -23,7 +24,7 @@ def test_fail_when_not_authenticated(client: Client):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_fail_when_requested_user_has_no_parent_child_pair(
+def test_fail_when_requested_user_has_no_parent(
     client: Client,
     create_user_and_get_token,
 ):
@@ -47,7 +48,10 @@ def test_fail_when_requested_user_has_no_parent_child_pair(
 
 
 @pytest.mark.django_db(transaction=True)
-def test_success__reverse_geocoded(client: Client, child_and_parent):
+def test_success__reverse_geocoded(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
 
@@ -85,10 +89,8 @@ def child_and_parent(create_user_and_get_token):
     parent, parent_token = create_user_and_get_token(
         phone_number='01087654321')
 
-    ParentChildPair.objects.create(
-        child=child,
-        parent=parent,
-    )
+    child.parent = parent
+    child.save()
 
     return {
         "child": child,

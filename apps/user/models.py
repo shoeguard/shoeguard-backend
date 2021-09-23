@@ -1,10 +1,11 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import List, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db import models
-
-from apps.common.models import BaseModel
+from django.db.models.query import QuerySet
 
 
 class UserManager(BaseUserManager):
@@ -46,27 +47,6 @@ class UserManager(BaseUserManager):
         return user
 
 
-class ParentChildPair(BaseModel):
-    child = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='child',
-    )
-    parent = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='parent',
-    )
-
-    def save(self, *args, **kwargs):
-        if self.child.partner is not None or self.parent.partner is not None:
-            raise ValueError('ParentChildPair already exists.')
-        if self.parent == self.child:
-            raise ValueError('Parent and Child must not be the same.')
-
-        super(ParentChildPair, self).save(*args, **kwargs)
-
-
 class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
@@ -75,11 +55,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     phone_number = models.CharField(max_length=12, unique=True)
     name = models.CharField(max_length=4)
-    partner = models.ForeignKey(
-        ParentChildPair,
-        related_name='partner',
-        on_delete=models.PROTECT,
+    parent = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
         null=True,
+        related_name="parent_user",
     )
 
     is_admin = models.BooleanField(default=False)
@@ -88,10 +68,24 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
 
     @property
-    def is_child(self) -> Union[bool, None]:
-        if self.partner is None:
+    def is_parent(self) -> Union[bool, None]:
+        has_child: bool = User.objects.filter(parent=self.id).exists()
+        return has_child
+
+    @property
+    def children(self) -> Union[Union[QuerySet[User], List[User]], None]:
+        if self.id is None:
             return None
-        return self.partner.child == self
+        if not self.is_parent:
+            return None
+        return User.objects.filter(parent=self.id)
+
+    def save(self, *args, **kwargs):
+        if self.parent is not None:
+            is_parent_self = self.id is not None and self.parent.id == self.id
+            if is_parent_self:
+                raise ValueError("Parent can't be self")
+        return super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.name

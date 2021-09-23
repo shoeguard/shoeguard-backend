@@ -1,8 +1,9 @@
 import json
+from typing import Dict, Union
 
 import pytest
 from apps.report.models import Report
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 from django.test.client import Client
 
 ENDPOINT = "/api/v1/reports"
@@ -23,7 +24,7 @@ def test_fail_when_not_authenticated(client: Client):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_fail_when_requested_user_has_no_parent_child_pair(
+def test_fail_when_requested_user_has_no_parent(
     client: Client,
     create_user_and_get_token,
 ):
@@ -47,11 +48,15 @@ def test_fail_when_requested_user_has_no_parent_child_pair(
 
 
 @pytest.mark.django_db(transaction=True)
-def test_fail_when_no_reported_device(client: Client, child_and_parent):
+def test_fail_when_no_reported_device(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
     data = DATA.copy()
     del data["reported_device"]
+
     # when
     response = client.post(
         ENDPOINT,
@@ -68,8 +73,10 @@ def test_fail_when_no_reported_device(client: Client, child_and_parent):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_fail_when_wrong_reported_device_type(client: Client,
-                                              child_and_parent):
+def test_fail_when_wrong_reported_device_type(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
     data = DATA.copy()
@@ -90,7 +97,10 @@ def test_fail_when_wrong_reported_device_type(client: Client,
 
 
 @pytest.mark.django_db(transaction=True)
-def test_success__geocoded(client: Client, child_and_parent):
+def test_success__geocoded(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
 
@@ -119,7 +129,10 @@ def test_success__geocoded(client: Client, child_and_parent):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_success__reverse_geocoded(client: Client, child_and_parent):
+def test_success__reverse_geocoded(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
     data = DATA.copy()
@@ -152,7 +165,10 @@ def test_success__reverse_geocoded(client: Client, child_and_parent):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_success__geocoded(client: Client, child_and_parent):
+def test_success__geocoded(
+    client: Client,
+    child_and_parent: Dict[str, Union[User, str]],
+):
     # given
     token: str = child_and_parent["child_token"]
 
@@ -191,10 +207,8 @@ def child_and_parent(create_user_and_get_token):
     parent, parent_token = create_user_and_get_token(
         phone_number='01087654321')
 
-    ParentChildPair.objects.create(
-        child=child,
-        parent=parent,
-    )
+    child.parent = parent
+    child.save()
 
     return {
         "child": child,

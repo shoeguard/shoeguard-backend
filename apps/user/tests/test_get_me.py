@@ -1,5 +1,4 @@
 import pytest
-from apps.user.models import User
 from django.test.client import Client
 
 ENDPOINT = '/api/v1/users/me'

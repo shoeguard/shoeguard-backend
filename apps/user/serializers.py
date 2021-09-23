@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_framework import serializers
 
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,36 +12,40 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'phone_number', 'name', 'is_child')
 
 
-class ParentChildPairSerializer(serializers.ModelSerializer):
-    def unique_parent_and_child(user_pk: int):
-        if ParentChildPair.objects.filter(
-                Q(parent_id=user_pk) | Q(child_id=user_pk)).exists():
+class AddChildSerializer(serializers.ModelSerializer):
+    child_id = serializers.IntegerField(write_only=True, required=True)
+    children = UserSerializer(read_only=True, many=True)
+
+    def validate_child_id(self, child_id: int) -> int:
+        user: User = self.context['request'].user
+        if user.id == child_id:
             raise serializers.ValidationError(
-                'Already associated with another ParentChildPair.')
-
-    child = UserSerializer(read_only=True)
-    parent = UserSerializer(read_only=True)
-    child_id = serializers.IntegerField(
-        write_only=True,
-        validators=(unique_parent_and_child, ),
-    )
-    parent_id = serializers.IntegerField(
-        write_only=True,
-        validators=(unique_parent_and_child, ),
-    )
-
-    class Meta:
-        model = ParentChildPair
-        fields = ('id', 'child', 'parent', 'child_id', 'parent_id')
-
-
-class UserPartnerSerializer(serializers.ModelSerializer):
-    partner = ParentChildPairSerializer()
-    is_child = serializers.BooleanField(read_only=True)
+                'You cannot add yourself as a child')
+        return child_id
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'name', 'is_child', 'partner')
+        fields = (
+            'child_id',
+            'children',
+        )
+
+
+class UserParentChildSerializer(serializers.ModelSerializer):
+    is_child = serializers.BooleanField(read_only=True)
+    parent = UserSerializer(read_only=True)
+    children = UserSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'phone_number',
+            'name',
+            'is_child',
+            'parent',
+            'children',
+        )
 
 
 class PasswordUpdateSerializer(serializers.Serializer):
