@@ -1,11 +1,12 @@
+from typing import List
+
 from rest_framework import mixins, permissions, serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from apps.common.decorators import check_partner_available_class_view
 from apps.report.models import Report
-from apps.report.serializers import NewReportSerializer, ReportSerializer
+from apps.report.serializers import ReportSerializer
 from apps.user.models import User
 
 
@@ -15,18 +16,22 @@ class ReportViewSet(
         mixins.ListModelMixin,
         GenericViewSet,
 ):
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return NewReportSerializer
-        return ReportSerializer
+    serializer_class = ReportSerializer
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Report.objects.none()
 
-        partner_id: int = self.request.user.partner_id
-        return Report.objects.filter(parent_child_pair_id=partner_id
-                                     ).select_related('parent_child_pair')
+        requested_user: User = self.request.user
+        if requested_user.is_parent:
+            children_ids: List[int] = [
+                user.id for user in requested_user.children
+            ]
+            return Report.objects.filter(
+                reporter__in=children_ids).select_related('reporter')
+        else:
+            return Report.objects.filter(
+                reporter=requested_user).select_related('reporter')
 
     def get_permissions(self):
         return (permissions.IsAuthenticated(), )

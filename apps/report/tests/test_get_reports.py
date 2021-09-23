@@ -1,8 +1,9 @@
+from typing import Dict, Union
 from unittest.mock import patch
 
 import pytest
 from apps.report.models import Report
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 from django.test.client import Client
 
 ENDPOINT = '/api/v1/reports'
@@ -20,19 +21,24 @@ def test_fail_when_not_authenticated(client: Client):
 @pytest.mark.django_db(transaction=True)
 def test_get_only_related_reports(
     client: Client,
-    child_and_parent_1,
-    child_and_parent_2,
+    child_and_parent_1: Dict[str, Union[User, str]],
+    child_and_parent_2: Dict[str, Union[User, str]],
+    create_user_and_get_token,
 ):
     # given
     CAP_1_REPORT_COUNT = 30
-    CAP_1_PARENT_CHILD_PAIR: ParentChildPair = child_and_parent_1[
-        "child"].partner
+    cap1_child: User = child_and_parent_1["child"]
     cap1_token: str = child_and_parent_1["child_token"]
 
     CAP_2_REPORT_COUNT = 43
-    CAP_2_PARENT_CHILD_PAIR: ParentChildPair = child_and_parent_2[
-        "child"].partner
-    cap2_token: str = child_and_parent_2["child_token"]
+    cap2_child: User = child_and_parent_2["child"]
+    cap2_child_2_user: User
+    cap2_child_2_user, _ = create_user_and_get_token(
+        phone_number="01044443333", )
+    cap2_child_2_user.parent = child_and_parent_2["parent"]
+    cap2_child_2_user.save()
+    cap2_token: str = child_and_parent_2["parent_token"]
+    CAP_2_REPORT_COUNT_2 = 21
 
     class DuckTypingLocation:
         latitude: float
@@ -47,13 +53,19 @@ def test_get_only_related_reports(
     with patch("apps.common.utils.Nominatim.geocode", return_value=location):
         for _ in range(CAP_1_REPORT_COUNT):
             Report.objects.create(
-                parent_child_pair=CAP_1_PARENT_CHILD_PAIR,
+                reporter_id=cap1_child.id,
                 address="서울시 용산구 원효로97길 33-4",
                 reported_device="IOT",
             )
         for _ in range(CAP_2_REPORT_COUNT):
             Report.objects.create(
-                parent_child_pair=CAP_2_PARENT_CHILD_PAIR,
+                reporter_id=cap2_child.id,
+                address="서울시 용산구 원효로97길 33-4",
+                reported_device="IOT",
+            )
+        for _ in range(CAP_2_REPORT_COUNT_2):
+            Report.objects.create(
+                reporter_id=cap2_child_2_user.id,
                 address="서울시 용산구 원효로97길 33-4",
                 reported_device="IOT",
             )
@@ -72,7 +84,8 @@ def test_get_only_related_reports(
     assert cap1_response.status_code == 200
     assert len(cap1_response.json()) == CAP_1_REPORT_COUNT
     assert cap2_response.status_code == 200
-    assert len(cap2_response.json()) == CAP_2_REPORT_COUNT
+    assert len(
+        cap2_response.json()) == CAP_2_REPORT_COUNT + CAP_2_REPORT_COUNT_2
 
 
 @pytest.fixture
@@ -86,10 +99,8 @@ def child_and_parent_1(create_user_and_get_token):
     parent, parent_token = create_user_and_get_token(
         phone_number='01087654321')
 
-    ParentChildPair.objects.create(
-        child=child,
-        parent=parent,
-    )
+    child.parent = parent
+    child.save()
 
     return {
         "child": child,
@@ -110,10 +121,8 @@ def child_and_parent_2(create_user_and_get_token):
     parent, parent_token = create_user_and_get_token(
         phone_number='01012341234')
 
-    ParentChildPair.objects.create(
-        child=child,
-        parent=parent,
-    )
+    child.parent = parent
+    child.save()
 
     return {
         "child": child,
