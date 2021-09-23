@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.report.models import Report
-from apps.user.serializers import ParentChildPairSerializer
+from apps.user.serializers import ParentChildPairSerializer, UserSerializer
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -18,4 +18,19 @@ class ReportSerializer(serializers.ModelSerializer):
             'reported_device',
             'audio_url',
             'created',
+        )
+
+
+class NewReportSerializer(serializers.ModelSerializer):
+    reporter = UserSerializer
+
+    class Meta:
+        model = Report
+        fields = (
+            'id',
+            'address',
+            'latitude',
+            'longitude',
+            'audio_url',
+            'reported_device',
         )
