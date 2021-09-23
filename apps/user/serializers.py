@@ -68,6 +68,12 @@ class AuthSerializer(serializers.ModelSerializer):
         fields = ('id', 'phone_number')
 
 
+class AuthVerifySerializer(serializers.Serializer):
+    is_verified = serializers.BooleanField(read_only=True)
+    phone_number = serializers.CharField(write_only=True)
+    code = serializers.IntegerField(write_only=True)
+
+
 class PasswordUpdateSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)

@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from apps.user.models import Auth, User
 from apps.user.serializers import (AddChildSerializer, AuthSerializer,
+                                   AuthVerifySerializer,
                                    PasswordUpdateSerializer,
                                    UserParentChildSerializer, UserSerializer)
 
@@ -110,6 +111,30 @@ class UserViewSet(viewsets.GenericViewSet):
 
 class PhoneVerificationViewSet(mixins.CreateModelMixin,
                                viewsets.GenericViewSet):
-    permission_classes = (permissions.IsAuthenticated, )
-    serializer_class = AuthSerializer
-    queryset = Auth.objects.none()
+    permission_classes = (permissions.AllowAny, )
+
+    def get_serializer_class(self):
+        if self.action == 'verify':
+            return AuthVerifySerializer
+        return AuthSerializer
+
+    queryset = Auth.objects.all()
+
+    @action(methods=['POST'], detail=False)
+    def verify(self, request: HttpRequest, *args, **kwargs):
+        serializer: AuthVerifySerializer = self.get_serializer(
+            data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone_number: str = serializer.validated_data['phone_number']
+        auth: Auth = Auth.objects.filter(phone_number=phone_number).first()
+        if auth is None:
+            raise serializers.ValidationError(
+                {"phone_number": "No phone verification record has created"})
+        if serializer.validated_data["code"] != auth.code:
+            raise serializers.ValidationError({"code": "Wrong code"})
+
+        auth.is_verified = True
+        auth.save()
+
+        return Response({"is_verified": True})
