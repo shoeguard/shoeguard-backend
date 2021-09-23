@@ -7,8 +7,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from apps.location_history.models import LocationHistory
-from apps.location_history.serializers import (LocationHistorySerializer,
-                                               NewLocationHistorySerializer)
+from apps.location_history.serializers import LocationHistorySerializer
 from apps.user.models import User
 
 
@@ -18,11 +17,7 @@ class LocationHistoryViewSet(
         mixins.ListModelMixin,
         viewsets.GenericViewSet,
 ):
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return NewLocationHistorySerializer
-        return LocationHistorySerializer
-
+    serializer_class = LocationHistorySerializer
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_queryset(self):
@@ -46,7 +41,7 @@ class LocationHistoryViewSet(
             raise serializers.ValidationError(
                 {"non_field_errors": "Reporter must have parent"})
 
-        serializer: NewLocationHistorySerializer = self.get_serializer(
+        serializer: LocationHistorySerializer = self.get_serializer(
             data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(reporter=user)
