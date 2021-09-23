@@ -19,6 +19,7 @@ django-model-utils = "^4.1.1"
 geopy = "^2.2.0"
 drf-spectacular = "^0.18.1"
 twilio = "^7.0.0"
+django-filter = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.31.0"
