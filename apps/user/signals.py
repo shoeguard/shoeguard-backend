@@ -1,5 +1,6 @@
 from os import environ
 
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from twilio.rest import Client
@@ -17,9 +18,10 @@ def send_sms_post_save_handler(
     if 'test' in environ['DJANGO_SETTINGS_MODULE']:
         return
     if created and not instance.is_verified:
-        account_sid = environ['TWILIO_ACCOUNT_SID']
-        auth_token = environ['TWILIO_AUTH_TOKEN']
-        client = Client(account_sid, auth_token)
+        client = Client(
+            settings.TWILIO_ACCOUNT_SID,
+            settings.TWILIO_AUTH_TOKEN,
+        )
 
         client.messages.create(
             body=f'[슈가드] 인증번호: {instance.code}',

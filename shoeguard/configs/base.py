@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from os import getenv
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -151,3 +155,6 @@ DATABASES = {
     }
 }
 DEBUG = True
+
+TWILIO_ACCOUNT_SID = getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = getenv('TWILIO_AUTH_TOKEN')
