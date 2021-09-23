@@ -1,5 +1,5 @@
 import pytest
-from apps.user.models import User
+from apps.user.models import Auth, User
 from django.test.client import Client
 
 
@@ -28,7 +28,28 @@ def test_fail_when_no_password(client: Client):
 
 
 @pytest.mark.django_db(transaction=True)
+def test_fail_when_not_authorized(client: Client):
+    # when
+    response = client.post(
+        '/api/v1/users/register',
+        data={
+            "phone_number": "01012341234",
+            "password": "e10nMuskP@ssword",
+            "name": "홍길동",
+        },
+    )
+
+    # then
+    result = response.json()
+    assert response.status_code == 400
+    assert User.objects.all().count() == 0
+
+
+@pytest.mark.django_db(transaction=True)
 def test_success(client: Client):
+    # given
+    Auth.objects.create(phone_number='01012341234', is_verified=True)
+
     # when
     response = client.post(
         '/api/v1/users/register',

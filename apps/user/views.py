@@ -4,12 +4,13 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from drf_spectacular.utils import extend_schema
-from rest_framework import permissions, serializers, status, viewsets
+from rest_framework import mixins, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.user.models import User
-from apps.user.serializers import (AddChildSerializer,
+from apps.user.models import Auth, User
+from apps.user.serializers import (AddChildSerializer, AuthSerializer,
+                                   AuthVerifySerializer,
                                    PasswordUpdateSerializer,
                                    UserParentChildSerializer, UserSerializer)
 
@@ -106,3 +107,34 @@ class UserViewSet(viewsets.GenericViewSet):
             instance=self.request.user)
 
         return Response(response_serializer.data)
+
+
+class PhoneVerificationViewSet(mixins.CreateModelMixin,
+                               viewsets.GenericViewSet):
+    permission_classes = (permissions.AllowAny, )
+
+    def get_serializer_class(self):
+        if self.action == 'verify':
+            return AuthVerifySerializer
+        return AuthSerializer
+
+    queryset = Auth.objects.all()
+
+    @action(methods=['POST'], detail=False)
+    def verify(self, request: HttpRequest, *args, **kwargs):
+        serializer: AuthVerifySerializer = self.get_serializer(
+            data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone_number: str = serializer.validated_data['phone_number']
+        auth: Auth = Auth.objects.filter(phone_number=phone_number).first()
+        if auth is None:
+            raise serializers.ValidationError(
+                {"phone_number": "No phone verification record has created"})
+        if serializer.validated_data["code"] != auth.code:
+            raise serializers.ValidationError({"code": "Wrong code"})
+
+        auth.is_verified = True
+        auth.save()
+
+        return Response({"is_verified": True})

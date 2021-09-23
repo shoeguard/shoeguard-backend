@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from random import randint
 from typing import List, Union
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db import models
 from django.db.models.query import QuerySet
+
+from apps.common.models import BaseModel
 
 
 class UserManager(BaseUserManager):
@@ -89,3 +92,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Auth(BaseModel):
+    phone_number = models.CharField(max_length=12)
+    code = models.IntegerField(max_length=6)
+    is_verified = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.code is None:
+            self.code = randint(100000, 999999)
+        return super(Auth, self).save(*args, **kwargs)

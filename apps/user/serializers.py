@@ -1,11 +1,25 @@
+from typing import Dict, Union
+
 from rest_framework import serializers
 
-from apps.user.models import User
+from apps.user.models import Auth, User
 
 
 class UserSerializer(serializers.ModelSerializer):
     is_child = serializers.BooleanField(read_only=True)
     password = serializers.CharField(write_only=True)
+
+    def validate(self, data: Dict[str, Union[int, str]]):
+        authorized: bool = Auth.objects.filter(
+            phone_number=data.get('phone_number'), is_verified=True).exists()
+        if not authorized:
+            raise serializers.ValidationError(
+                "Phone number verification has not done")
+
+        Auth.objects.filter(phone_number=data.get('phone_number'),
+                            is_verified=True).delete()
+
+        return data
 
     class Meta:
         model = User
@@ -46,6 +60,18 @@ class UserParentChildSerializer(serializers.ModelSerializer):
             'parent',
             'children',
         )
+
+
+class AuthSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Auth
+        fields = ('id', 'phone_number')
+
+
+class AuthVerifySerializer(serializers.Serializer):
+    is_verified = serializers.BooleanField(read_only=True)
+    phone_number = serializers.CharField(write_only=True)
+    code = serializers.IntegerField(write_only=True)
 
 
 class PasswordUpdateSerializer(serializers.Serializer):
