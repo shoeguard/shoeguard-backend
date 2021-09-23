@@ -16,5 +16,6 @@ class ReportSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'reported_device',
+            'audio_url',
             'created',
         )
