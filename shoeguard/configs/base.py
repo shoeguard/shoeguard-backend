@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from os import getenv
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -137,6 +138,16 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Values that should be filled from other setting files
 
-SECRET_KEY = NotImplemented
-DATABASES = NotImplemented
-DEBUG = NotImplemented
+SECRET_KEY = getenv(
+    "DJANGO_SECRET_KEY",
+    'django-insecure-q5n4(&ogy*gbw@pj#7+@pjwulg6sd9*l1(m$6m(bibu%x@vhr7')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'shoeguard',
+        'USER': 'shoeguard',
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
+    }
+}
+DEBUG = True

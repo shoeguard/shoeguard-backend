@@ -3,7 +3,9 @@ from os import getenv
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q5n4(&ogy*gbw@pj#7+@pjwulg6sd9*l1(m$6m(bibu%x@vhr7'
+SECRET_KEY = getenv(
+    "DJANGO_SECRET_KEY",
+    'django-insecure-q5n4(&ogy*gbw@pj#7+@pjwulg6sd9*l1(m$6m(bibu%x@vhr7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
