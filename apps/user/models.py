@@ -7,8 +7,6 @@ from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db import models
 from django.db.models.query import QuerySet
 
-from apps.common.models import BaseModel
-
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -47,27 +45,6 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-
-
-class ParentChildPair(BaseModel):
-    child = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='child_pair',
-    )
-    parent = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='parent_pair',
-    )
-
-    def save(self, *args, **kwargs):
-        if self.child.partner is not None or self.parent.partner is not None:
-            raise ValueError('ParentChildPair already exists.')
-        if self.parent == self.child:
-            raise ValueError('Parent and Child must not be the same.')
-
-        super(ParentChildPair, self).save(*args, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
