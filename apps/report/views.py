@@ -1,5 +1,6 @@
 from typing import List
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, permissions, serializers, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -17,6 +18,8 @@ class ReportViewSet(
         GenericViewSet,
 ):
     serializer_class = ReportSerializer
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ('reported_device', )
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
