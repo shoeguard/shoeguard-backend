@@ -11,31 +11,28 @@ from rest_framework.response import Response
 from apps.user.models import ParentChildPair, User
 from apps.user.serializers import (ParentChildPairSerializer,
                                    PasswordUpdateSerializer,
-                                   UserPartnerSerializer, UserSerializer)
+                                   UserParentChildSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.GenericViewSet):
-    def get_serializer_class(self):
-        if self.action == 'me':
-            return UserPartnerSerializer
-        return UserSerializer
+    AUTHENTICATION_REQUIRED_ACTIONS = ['me', 'update_password', 'add_child']
+
+    def get_permissions(self):
+        if self.action in self.AUTHENTICATION_REQUIRED_ACTIONS:
+            return (permissions.IsAuthenticated(), )
+        return (permissions.AllowAny(), )
 
     def get_queryset(self):
         if self.action == 'me':
-            return User.objects.all().select_related('partner').select_related(
-                'child', 'parent')
+            return User.objects.all().select_related('parent_user')
         return User.objects.all()
 
     def get_serializer_class(self, *args, **kwargs):
+        if self.action == 'me':
+            return UserParentChildSerializer
         if self.action == 'update_password':
             return PasswordUpdateSerializer
         return UserSerializer
-
-    def get_permissions(self):
-        AUTHENTICATION_REQUIRED_ACTIONS = ['me', 'update_password']
-        if self.action in AUTHENTICATION_REQUIRED_ACTIONS:
-            return (permissions.IsAuthenticated(), )
-        return (permissions.AllowAny(), )
 
     @action(methods=['post'], detail=False)
     def register(self, request: HttpRequest, *args, **kwargs):
@@ -44,10 +41,11 @@ class UserViewSet(viewsets.GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @extend_schema(responses={200: UserPartnerSerializer(many=False)})
+    @extend_schema(responses={200: UserParentChildSerializer(many=False)})
     @action(methods=['GET'], detail=False)
     def me(self, request: HttpRequest, *args, **kwargs):
-        serializer: UserPartnerSerializer = UserPartnerSerializer(request.user)
+        serializer: UserParentChildSerializer = UserParentChildSerializer(
+            request.user)
         return Response(serializer.data)
 
     @action(methods=['POST'], detail=False, url_path='update-password')

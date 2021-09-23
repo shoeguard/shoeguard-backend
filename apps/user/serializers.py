@@ -12,6 +12,23 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'phone_number', 'name', 'is_child')
 
 
+class UserParentChildSerializer(serializers.ModelSerializer):
+    is_child = serializers.BooleanField(read_only=True)
+    parent = UserSerializer(read_only=True)
+    children = UserSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'phone_number',
+            'name',
+            'is_child',
+            'parent',
+            'children',
+        )
+
+
 class ParentChildPairSerializer(serializers.ModelSerializer):
     def unique_parent_and_child(user_pk: int):
         if ParentChildPair.objects.filter(
