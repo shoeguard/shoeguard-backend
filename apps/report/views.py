@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.common.decorators import check_partner_available_class_view
 from apps.report.models import Report
-from apps.report.serializers import ReportSerializer
+from apps.report.serializers import NewReportSerializer, ReportSerializer
 from apps.user.models import User
 
 
@@ -15,7 +15,10 @@ class ReportViewSet(
         mixins.ListModelMixin,
         GenericViewSet,
 ):
-    serializer_class = ReportSerializer
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return NewReportSerializer
+        return ReportSerializer
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
@@ -28,16 +31,16 @@ class ReportViewSet(
     def get_permissions(self):
         return (permissions.IsAuthenticated(), )
 
-    @check_partner_available_class_view
     def create(self, request: Request, *args, **kwargs):
         user: User = request.user
+        if user.parent is None:
+            raise serializers.ValidationError(
+                {"non_field_errors": "Reporter must have parent"})
 
-        payload = dict(request.data)
-        payload['parent_child_pair'] = user.partner_id
-        serializer: ReportSerializer = self.get_serializer(data=payload)
+        serializer: ReportSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save(reporter=user)
 
-        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data,
