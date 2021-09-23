@@ -4,14 +4,12 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from drf_spectacular.utils import extend_schema
-from rest_framework import (mixins, permissions, response, serializers, status,
-                            viewsets)
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 from apps.user.serializers import (AddChildSerializer,
-                                   ParentChildPairSerializer,
                                    PasswordUpdateSerializer,
                                    UserParentChildSerializer, UserSerializer)
 
