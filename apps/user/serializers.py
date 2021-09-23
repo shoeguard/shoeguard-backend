@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework import serializers
 
 from apps.user.models import User
@@ -6,10 +5,11 @@ from apps.user.models import User
 
 class UserSerializer(serializers.ModelSerializer):
     is_child = serializers.BooleanField(read_only=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'name', 'is_child')
+        fields = ('id', 'phone_number', 'password', 'name', 'is_child')
 
 
 class AddChildSerializer(serializers.ModelSerializer):
