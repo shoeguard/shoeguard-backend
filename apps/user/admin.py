@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django_restful_admin import admin as api_admin
 
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 
 
 @admin.register(User)

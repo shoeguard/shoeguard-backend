@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.common.models import BaseModel
-from apps.user.models import ParentChildPair, User
+from apps.user.models import User
 
 
 class LocationHistory(BaseModel):
