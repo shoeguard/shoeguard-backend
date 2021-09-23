@@ -12,9 +12,8 @@ from os import getenv
 
 from django.core.wsgi import get_wsgi_application
 
-SETTINGS = getenv("DJANGO_SECRET_KEY")
+SETTINGS = getenv("DJANGO_SETTINGS_MODULE", 'shoeguard.configs.prod')
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE',
-                      SETTINGS if SETTINGS else 'shoeguard.settings.dev')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', SETTINGS)
 
 application = get_wsgi_application()
