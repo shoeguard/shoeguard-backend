@@ -48,15 +48,6 @@ class UserParentChildSerializer(serializers.ModelSerializer):
         )
 
 
-class UserPartnerSerializer(serializers.ModelSerializer):
-    partner = ParentChildPairSerializer()
-    is_child = serializers.BooleanField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ('id', 'phone_number', 'name', 'is_child', 'partner')
-
-
 class PasswordUpdateSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
