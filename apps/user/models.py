@@ -91,14 +91,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
 
     @property
-    def is_child(self) -> Union[bool, None]:
-        return self.parent is not None
+    def is_parent(self) -> Union[bool, None]:
+        has_child: bool = User.objects.filter(parent=self.id).exists()
+        return has_child
 
     @property
     def children(self) -> Union[Union[QuerySet[User], List[User]], None]:
         if self.id is None:
             return None
-        if self.is_child:
+        if not self.is_parent:
             return None
         return User.objects.filter(parent=self.id)
 

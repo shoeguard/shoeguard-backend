@@ -6,10 +6,7 @@ from apps.user.models import ParentChildPair, User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'phone_number', 'name', 'is_child')
+    list_display = ('id', 'phone_number', 'name', 'is_parent')
 
-
-admin.site.register(ParentChildPair)
 
 api_admin.site.register(User)
-api_admin.site.register(ParentChildPair)
