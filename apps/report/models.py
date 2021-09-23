@@ -10,11 +10,6 @@ class Report(BaseModel):
         IOT = 'IOT', _('IOT')
         PHONE = 'PHONE', _('PHONE')
 
-    parent_child_pair = models.ForeignKey(
-        ParentChildPair,
-        on_delete=models.CASCADE,
-        null=True,
-    )
     reporter = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=255, null=True)
     latitude = models.FloatField(null=True)
