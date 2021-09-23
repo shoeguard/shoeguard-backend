@@ -1,0 +1,87 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - name: Setup Poetry
+        uses: snok/install-poetry@v1.1.1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Setup DB for Test
+        run: docker-compose up -d test_db
+      # Setup Environments
+
+      - name: Cache Dependencies
+        id: cache-dependency
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: virtualenv_${{ runner.os }}_${{ hashFiles('**/poetry.lock') }}
+      - name: Install Dependencies
+        run: poetry install
+        if: steps.cache-dependency.cache-hit != 'true'
+      # Install Dependencies
+
+      - name: Run Tests
+        run: poetry run pytest . --migrations
+
+      - name: Teardown DB
+        run: docker-compose down
+
+  build:
+    needs: [test]
+    name: Build
+    runs-on: ubuntu-latest
+    # build process is currently not required, but for archiving
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to Docker
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Download Cache from Github Container Registry
+        run: docker pull ghcr.io/$GITHUB_REPOSITORY/buildcache || true
+      - name: Just nothing
+        run: |
+          pwd
+          ls -al
+      - name: Build Docker Image
+        run: docker build -t shoeguard --cache-from=ghcr.io/$GITHUB_REPOSITORY/buildcache --build-arg BUILDKIT_INLINE_CACHE=1 .
+      - name: Update Cache in Github Container Registry
+        run: |
+          docker tag shoeguard ghcr.io/$GITHUB_REPOSITORY/buildcache
+          docker push ghcr.io/$GITHUB_REPOSITORY/buildcache
+      - name: Logout from Docker
+        run: docker logout ghcr.io
+
+  deploy:
+    needs: [test]
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying to the Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: 22
+          script: |
+            cd shoeguard-backend;\
+            export DJANGO_SETTINGS_MODULE=shoeguard.configs.prod;\
+            docker-compose down;
+            docker container prune -f;\
+            docker image prune -af;\
+            docker-compose up -d --build was ws
