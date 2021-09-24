@@ -86,5 +86,5 @@ jobs:
             docker-compose down;
             docker container prune -f;\
             docker image prune -af;\
-            docker-compose build --no-cache was;\
-            docker-compose up -d was ws
+            docker-compose --env-file .env build --no-cache was;\
+            docker-compose --env-file .env up -d was ws
