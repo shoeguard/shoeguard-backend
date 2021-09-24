@@ -37,6 +37,8 @@ services:
     environment:
       - "DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}"
       - "DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}"
+      - "TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}"
+      - "TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}"
     volumes:
       - ./volumes/staticfiles/:/app/shoeguard/static
 
