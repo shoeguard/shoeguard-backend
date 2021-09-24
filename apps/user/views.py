@@ -127,7 +127,8 @@ class PhoneVerificationViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
 
         phone_number: str = serializer.validated_data['phone_number']
-        auth: Auth = Auth.objects.filter(phone_number=phone_number).first()
+        auth: Auth = Auth.objects.filter(
+            phone_number=phone_number).order_by('-created').first()
         if auth is None:
             raise serializers.ValidationError(
                 {"phone_number": "No phone verification record has created"})
