@@ -1,5 +1,5 @@
 import pytest
-from apps.user.models import Auth, User
+from apps.user.models import Auth
 from django.test.client import Client
 
 ENDPOINT = '/api/v1/phone-verification/verify'
@@ -9,6 +9,9 @@ ENDPOINT = '/api/v1/phone-verification/verify'
 def test_success(client: Client):
     # given
     PHONE_NUMBER = "01012341234"
+    ## create dummy and real data
+    Auth.objects.create(phone_number=PHONE_NUMBER)
+    Auth.objects.create(phone_number=PHONE_NUMBER)
     auth: Auth = Auth.objects.create(phone_number=PHONE_NUMBER)
 
     # when

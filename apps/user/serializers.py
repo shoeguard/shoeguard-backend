@@ -16,9 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Phone number verification has not done")
 
-        Auth.objects.filter(phone_number=data.get('phone_number'),
-                            is_verified=True).delete()
-
         return data
 
     class Meta:
