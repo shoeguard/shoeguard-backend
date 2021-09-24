@@ -37,6 +37,8 @@ services:
     environment:
       - "DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}"
       - "DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}"
+    env_file:
+      - .env
     volumes:
       - ./volumes/staticfiles/:/app/shoeguard/static
 
