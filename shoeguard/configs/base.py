@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 from os import getenv
 from pathlib import Path
 
@@ -158,3 +159,10 @@ DEBUG = True
 
 TWILIO_ACCOUNT_SID = getenv('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = getenv('TWILIO_AUTH_TOKEN')
+
+...
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=365),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
+}
