@@ -6,6 +6,7 @@ from apps.user.serializers import UserSerializer
 
 class ReportSerializer(serializers.ModelSerializer):
     reporter = UserSerializer
+    audio_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Report
