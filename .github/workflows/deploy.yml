@@ -83,8 +83,4 @@ jobs:
             git checkout master;\
             git pull;\
             export DJANGO_SETTINGS_MODULE=shoeguard.configs.prod;\
-            docker-compose down;
-            docker container prune -f;\
-            docker image prune -af;\
-            docker-compose --env-file .env build --no-cache was;\
-            docker-compose --env-file .env up -d was ws
+            docker-compose --env-file .env up --build --remove-orphans --force-recreate was;
