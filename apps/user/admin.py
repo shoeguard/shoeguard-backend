@@ -9,7 +9,14 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'phone_number', 'name', 'is_parent')
 
 
-admin.site.register(Auth)
+@admin.register(Auth)
+class AuthAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'phone_number',
+        'code',
+    )
+
 
 api_admin.site.register(User)
 api_admin.site.register(Auth)
