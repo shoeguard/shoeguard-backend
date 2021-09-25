@@ -15,6 +15,7 @@ class AuthAdmin(admin.ModelAdmin):
         'id',
         'phone_number',
         'code',
+        'is_verified',
     )
 
 
