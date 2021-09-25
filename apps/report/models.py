@@ -11,10 +11,10 @@ class Report(BaseModel):
         PHONE = 'PHONE', _('PHONE')
 
     reporter = models.ForeignKey(User, on_delete=models.CASCADE)
-    address = models.CharField(max_length=255, null=True)
-    latitude = models.FloatField(null=True)
-    longitude = models.FloatField(null=True)
-    audio_url = models.URLField(null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    audio_url = models.URLField(blank=True, null=True)
     reported_device = models.CharField(
         max_length=5,
         choices=ReportedDeviceType.choices,
