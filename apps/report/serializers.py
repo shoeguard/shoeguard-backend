@@ -19,3 +19,12 @@ class ReportSerializer(serializers.ModelSerializer):
             'reported_device',
             'created',
         )
+
+
+class ReportUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = (
+            'id',
+            'audio_url',
+        )
