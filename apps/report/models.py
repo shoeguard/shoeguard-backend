@@ -19,3 +19,4 @@ class Report(BaseModel):
         max_length=5,
         choices=ReportedDeviceType.choices,
     )
+    is_done = models.BooleanField(default=False)
