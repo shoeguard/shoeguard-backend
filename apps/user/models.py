@@ -84,10 +84,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return User.objects.filter(parent=self.id)
 
     def save(self, *args, **kwargs):
-        if self.parent is not None:
-            is_parent_self = self.id is not None and self.parent.id == self.id
-            if is_parent_self:
-                raise ValueError("Parent can't be self")
+        if self.id is None:
+            if self.parent is not None:
+                is_parent_self = self.parent.id == self.id
+                if is_parent_self:
+                    raise ValueError("Parent can't be self")
+            parent_try_to_be_child = self.is_parent and self.parent is not None
+            if parent_try_to_be_child:
+                raise ValueError(
+                    "Parent can't have parent, having a parent also means that it becomes child'"
+                )
         return super(User, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
