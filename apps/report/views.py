@@ -7,19 +7,24 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.report.models import Report
-from apps.report.serializers import ReportSerializer
+from apps.report.serializers import ReportSerializer, ReportUpdateSerializer
 from apps.user.models import User
 
 
 class ReportViewSet(
         mixins.CreateModelMixin,
         mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         GenericViewSet,
 ):
-    serializer_class = ReportSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('reported_device', )
+
+    def get_serializer_class(self):
+        if 'update' in self.action:
+            return ReportUpdateSerializer
+        return ReportSerializer
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
