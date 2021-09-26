@@ -81,6 +81,6 @@ jobs:
             cd shoeguard-backend;\
             git checkout master > /dev/null 2>&1;\
             git pull;\
-            docker-compose --env-file .env build --build-arg "--cache-from=ghcr.io/shoeguard/shoeguard-backend/buildcache --build-arg BUILDKIT_INLINE_CACHE=1" was;\
+            docker-compose --env-file .env build --build-arg "--cache-from=ghcr.io/$GITHUB_REPOSITORY/buildcache BUILDKIT_INLINE_CACHE=1" was;\
             docker-compose --env-file .env up -d --no-build --remove-orphans --force-recreate was;\
             docker image prune -af
