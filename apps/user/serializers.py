@@ -6,8 +6,20 @@ from apps.user.models import Auth, User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    def phone_number_validator(phone_number: str):
+        if not phone_number.isnumeric():
+            raise serializers.ValidationError("Phone number must be numeric")
+        if not phone_number.startswith('010'):
+            raise serializers.ValidationError(
+                "Phone number must start with 010")
+        if not len(phone_number) == 11:
+            raise serializers.ValidationError(
+                "The length of Phone Number must be 11, like in format of: 01012345678"
+            )
+
     is_child = serializers.BooleanField(read_only=True)
     password = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(validators=[phone_number_validator])
 
     def validate(self, data: Dict[str, Union[int, str]]):
         authorized: bool = Auth.objects.filter(
