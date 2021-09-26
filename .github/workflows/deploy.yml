@@ -45,7 +45,6 @@ jobs:
     needs: [test]
     name: Build
     runs-on: ubuntu-latest
-    # build process is currently not required, but for archiving
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -67,7 +66,7 @@ jobs:
         run: docker logout ghcr.io
 
   deploy:
-    needs: [test]
+    needs: [build]
     name: Deploy
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +79,8 @@ jobs:
           port: 22
           script: |
             cd shoeguard-backend;\
-            git checkout master;\
+            git checkout master > /dev/null 2>&1;\
             git pull;\
-            export DJANGO_SETTINGS_MODULE=shoeguard.configs.prod;\
-            docker-compose --env-file .env up -d --build --remove-orphans --force-recreate was;
+            docker-compose --env-file .env build was --build-arg "--cache-from=ghcr.io/shoeguard/shoeguard-backend/buildcache --build-arg BUILDKIT_INLINE_CACHE=1";\
+            docker-compose --env-file .env up -d --no-build --remove-orphans --force-recreate was;\
+            docker image prune -af
