@@ -18,9 +18,3 @@ def reverse_geocode(latitude: float, longitude: float) -> Union[str, None]:
     if location is None:
         return None
     return location.address
-
-
-def check_partner_available(user: User):
-    if user.partner is None:
-        raise ValidationError(
-            {"non_field_errors": "Requested user has no partner."})
