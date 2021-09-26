@@ -30,6 +30,7 @@ services:
       - "fsync=off"
 
   was:
+    image: "backend_was"
     build: .
     restart: "unless-stopped"
     expose:
