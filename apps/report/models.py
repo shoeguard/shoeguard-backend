@@ -20,3 +20,9 @@ class Report(BaseModel):
         choices=ReportedDeviceType.choices,
     )
     is_done = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        reporter: User = self.reporter
+        if reporter.parent is None:
+            raise ValueError("Reporter must have a parent")
+        super(Report, self).save(*args, **kwargs)
