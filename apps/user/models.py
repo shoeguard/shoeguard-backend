@@ -85,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return User.objects.filter(parent=self.id)
 
     def save(self, *args, **kwargs):
-        if self.id is None:
+        if not self.id is None:
             if self.parent is not None:
                 is_parent_self = self.parent.id == self.id
                 if is_parent_self:
