@@ -34,15 +34,13 @@ class LocationHistoryViewSet(
                 reporter=requested_user).select_related('reporter')
 
     def create(self, request: Request, *args, **kwargs):
-        user: User = request.user
-        if user.parent is None:
-            raise serializers.ValidationError(
-                {"non_field_errors": "Reporter must have parent"})
-
         serializer: LocationHistorySerializer = self.get_serializer(
             data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(reporter=user)
+        try:
+            serializer.save(reporter=request.user)
+        except Exception as e:
+            raise serializers.ValidationError({'non_field_errors': [str(e)]})
 
         headers = self.get_success_headers(serializer.data)
         return Response(
