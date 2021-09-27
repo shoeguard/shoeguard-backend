@@ -43,8 +43,10 @@ class UserViewSet(viewsets.GenericViewSet):
     def register(self, request: HttpRequest, *args, **kwargs):
         serializer: UserSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        User.objects.create_user(**serializer.validated_data)
+        try:
+            User.objects.create_user(**serializer.validated_data)
+        except ValueError as e:
+            raise serializers.ValidationError({'non_field_errors': [str(e)]})
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

@@ -46,6 +46,27 @@ def test_fail_when_not_authorized(client: Client):
 
 
 @pytest.mark.django_db(transaction=True)
+def test_fail_when_wrong_phone_number(client: Client):
+    # given
+    Auth.objects.create(phone_number='01012341234', is_verified=True)
+
+    # when
+    response = client.post(
+        '/api/v1/users/register',
+        data={
+            "phone_number": "1234",
+            "password": "e10nMuskP@ssword",
+            "name": "홍길동",
+        },
+    )
+
+    # then
+    result = response.json()
+    assert response.status_code == 400
+    assert 'phone_number' in result
+
+
+@pytest.mark.django_db(transaction=True)
 def test_success(client: Client):
     # given
     Auth.objects.create(phone_number='01012341234', is_verified=True)
